@@ -31,11 +31,14 @@ class CubePageView extends StatefulWidget {
   /// Widgets you want to use inside the [CubePageView], this is only required if you use [CubePageView] constructor
   final List<Widget> children;
 
+  final ScrollPhysics physics;  
+
   /// Creates a scrollable list that works page by page from an explicit [List]
   /// of widgets.
   const CubePageView({
     Key key,
     this.onPageChanged,
+    this.physics,
     this.controller,
     @required this.children,
   })  : itemBuilder = null,
@@ -59,6 +62,7 @@ class CubePageView extends StatefulWidget {
     @required this.itemCount,
     @required this.itemBuilder,
     this.onPageChanged,
+    this.physics,
     this.controller,
   })  : this.children = null,
         assert(itemCount != null),
@@ -104,7 +108,7 @@ class _CubePageViewState extends State<CubePageView> {
           builder: (_, value, child) => PageView.builder(
             controller: _pageController,
             onPageChanged: widget.onPageChanged,
-            physics: const ClampingScrollPhysics(),
+            physics: widget.physics ?? ClampingScrollPhysics(),
             itemCount: widget.itemCount ?? widget.children.length,
             itemBuilder: (_, index) {
               if (widget.itemBuilder != null)
@@ -147,7 +151,6 @@ class CubeWidget extends StatelessWidget {
     final isLeaving = (index - pageNotifier) <= 0;
     final t = (index - pageNotifier);
     final rotationY = lerpDouble(0, 90, t);
-    final opacity = lerpDouble(0, 1, t.abs()).clamp(0.0, 1.0);
     final transform = Matrix4.identity();
     transform.setEntry(3, 2, 0.003);
     transform.rotateY(-degToRad(rotationY));
@@ -157,16 +160,6 @@ class CubeWidget extends StatelessWidget {
       child: Stack(
         children: [
           child,
-          Positioned.fill(
-            child: Opacity(
-              opacity: opacity,
-              child: Container(
-                child: Container(
-                  color: Colors.black87,
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
